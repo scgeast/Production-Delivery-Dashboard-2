@@ -40,6 +40,44 @@
             margin-bottom: 15px;
         }
         
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: #ecf0f1;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .tab-button.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .tab-button:hover {
+            background: #bdc3c7;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -250,6 +288,16 @@
             color: white;
         }
         
+        .btn-success {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+        
         .btn:hover {
             opacity: 0.9;
             transform: translateY(-2px);
@@ -277,6 +325,90 @@
             color: #7f8c8d;
         }
         
+        /* Form Entry Styles */
+        .entry-form {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .action-cell {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: #2ecc71;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
         @media (max-width: 768px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -293,6 +425,14 @@
             .chart-container {
                 height: 250px;
             }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -300,177 +440,418 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-concrete"></i> Monitoring Pengiriman Beton</h1>
-            <p>Terakhir update: <span id="last-update">05/09/2025 15:30</span></p>
+            <p>Terakhir update: <span id="last-update">--/--/---- --:--</span></p>
         </header>
 
-        <section class="dashboard">
-            <div class="stat-card">
-                <h3><i class="fas fa-cubes"></i> Total Volume Order</h3>
-                <div class="value" id="total-volume">258 m³</div>
-                <p>Total volume beton yang dipesan</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-truck-loading"></i> Volume Terkirim</h3>
-                <div class="value" id="volume-terkirim">45 m³</div>
-                <p>Volume beton yang sudah dikirim</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-clock"></i> Volume Tertunda</h3>
-                <div class="value" id="volume-tertunda">213 m³</div>
-                <p>Volume beton yang belum dikirim</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-building"></i> Total Proyek</h3>
-                <div class="value" id="total-proyek">9</div>
-                <p>Jumlah total proyek</p>
-            </div>
-            <div class="stat-card">
-                <h3><i class="fas fa-hourglass-half"></i> Proyek Tertunda</h3>
-                <div class="value" id="project-remain">7</div>
-                <p>Jumlah proyek dengan sisa pengiriman</p>
-            </div>
-        </section>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="entry">Entry Data</button>
+            <button class="tab-button" data-tab="dashboard">Dashboard</button>
+        </div>
 
-        <div class="charts-container">
-            <div class="chart-card">
-                <h2><i class="fas fa-chart-pie"></i> Distribusi Volume</h2>
-                <div class="chart-container">
-                    <canvas id="volumeChart"></canvas>
+        <!-- Tab Entry Data -->
+        <div id="entry-tab" class="tab-content active">
+            <section class="entry-form">
+                <h2><i class="fas fa-edit"></i> Entry Data Pengiriman</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tanggal">Tanggal</label>
+                        <input type="date" id="tanggal" value="2025-09-05">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="plant">Plant</label>
+                        <select id="plant-input">
+                            <option value="Denpasar 2">Denpasar 2</option>
+                            <option value="Gianyar">Gianyar</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="site-no">Site No</label>
+                        <input type="text" id="site-no" placeholder="Masukkan Site No">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="site-name">Site Name</label>
+                        <input type="text" id="site-name" placeholder="Masukkan Site Name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qty-order">Qty Order (m³)</label>
+                        <input type="number" id="qty-order" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qty-delivery">Qty Delivery (m³)</label>
+                        <input type="number" id="qty-delivery" min="0" value="0">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="qty-cancel">Qty Cancel (m³)</label>
+                        <input type="number" id="qty-cancel" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="qty-remain">Qty Remain (m³)</label>
+                        <input type="number" id="qty-remain" value="0" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="opacity: 0;">Aksi</label>
+                        <button class="btn btn-success" id="tambah-data"><i class="fas fa-plus"></i> Tambah Data</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="card">
+                <h2><i class="fas fa-database"></i> Data Pengiriman</h2>
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Plant</th>
+                            <th>Site No</th>
+                            <th>Site Name</th>
+                            <th>Qty Order</th>
+                            <th>Qty Delivery</th>
+                            <th>Qty Remain</th>
+                            <th>Qty Cancel</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Data akan diisi secara dinamis -->
+                    </tbody>
+                </table>
+                
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="simpan-data"><i class="fas fa-save"></i> Simpan Data</button>
+                    <button class="btn btn-danger" id="reset-data"><i class="fas fa-trash"></i> Reset Data</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Tab Dashboard -->
+        <div id="dashboard-tab" class="tab-content">
+            <section class="dashboard">
+                <div class="stat-card">
+                    <h3><i class="fas fa-cubes"></i> Total Volume Order</h3>
+                    <div class="value" id="total-volume">0 m³</div>
+                    <p>Total volume beton yang dipesan</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-truck-loading"></i> Volume Terkirim</h3>
+                    <div class="value" id="volume-terkirim">0 m³</div>
+                    <p>Volume beton yang sudah dikirim</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-clock"></i> Volume Tertunda</h3>
+                    <div class="value" id="volume-tertunda">0 m³</div>
+                    <p>Volume beton yang belum dikirim</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-building"></i> Total Proyek</h3>
+                    <div class="value" id="total-proyek">0</div>
+                    <p>Jumlah total proyek</p>
+                </div>
+                <div class="stat-card">
+                    <h3><i class="fas fa-hourglass-half"></i> Proyek Tertunda</h3>
+                    <div class="value" id="project-remain">0</div>
+                    <p>Jumlah proyek dengan sisa pengiriman</p>
+                </div>
+            </section>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h2><i class="fas fa-chart-pie"></i> Distribusi Volume</h2>
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h2><i class="fas fa-chart-bar"></i> Perbandingan per Plant</h2>
+                    <div class="chart-container">
+                        <canvas id="plantComparisonChart"></canvas>
+                    </div>
                 </div>
             </div>
-            <div class="chart-card">
-                <h2><i class="fas fa-chart-bar"></i> Perbandingan per Plant</h2>
-                <div class="chart-container">
-                    <canvas id="plantComparisonChart"></canvas>
+
+            <section class="card">
+                <h2><i class="fas fa-filter"></i> Filter Data</h2>
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="dari-tanggal">Dari Tanggal:</label>
+                        <input type="date" id="dari-tanggal">
+                    </div>
+                    <div class="filter-group">
+                        <label for="sampai-tanggal">Sampai Tanggal:</label>
+                        <input type="date" id="sampai-tanggal">
+                    </div>
+                    <div class="filter-group">
+                        <label for="plant">Plant:</label>
+                        <select id="plant">
+                            <option value="semua">Semua Plant</option>
+                            <option value="Denpasar 2">Denpasar 2</option>
+                            <option value="Gianyar">Gianyar</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="status">Status:</label>
+                        <select id="status">
+                            <option value="semua">Semua Status</option>
+                            <option value="terkirim">Terkirim</option>
+                            <option value="tertunda">Tertunda</option>
+                        </select>
+                    </div>
                 </div>
+                <div class="filter-actions">
+                    <button class="btn btn-primary" id="terapkan-filter">
+                        <i class="fas fa-check"></i> Terapkan Filter
+                    </button>
+                    <button class="btn btn-secondary" id="reset-filter">
+                        <i class="fas fa-redo"></i> Reset Filter
+                    </button>
+                </div>
+            </section>
+
+            <section class="summary-cards">
+                <div class="plant-summary">
+                    <h2><i class="fas fa-industry"></i> Denpasar 2</h2>
+                    <p><strong>Volume Order:</strong> <span id="denpasar-order">0</span> m³</p>
+                    <p><strong>Volume Terkirim:</strong> <span id="denpasar-terkirim">0</span> m³</p>
+                    <p><strong>Volume Tertunda:</strong> <span id="denpasar-tertunda">0</span> m³</p>
+                    <p><strong>Proyek Tertunda:</strong> <span id="denpasar-proyek-tertunda">0</span></p>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill denpasar-progress" id="denpasar-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="percentage">
+                        <span class="terkirim">Terkirim: 0%</span>
+                        <span class="tertunda">Tertunda: 0%</span>
+                    </div>
+                </div>
+                
+                <div class="plant-summary">
+                    <h2><i class="fas fa-industry"></i> Gianyar</h2>
+                    <p><strong>Volume Order:</strong> <span id="gianyar-order">0</span> m³</p>
+                    <p><strong>Volume Terkirim:</strong> <span id="gianyar-terkirim">0</span> m³</p>
+                    <p><strong>Volume Tertunda:</strong> <span id="gianyar-tertunda">0</span> m³</p>
+                    <p><strong>Proyek Tertunda:</strong> <span id="gianyar-proyek-tertunda">0</span></p>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill gianyar-progress" id="gianyar-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="percentage">
+                        <span class="terkirim">Terkirim: 0%</span>
+                        <span class="tertunda">Tertunda: 0%</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="last-update">
+                <p>Data diperbarui secara real-time. Terakhir update: <span id="update-time">--/--/---- --:--</span></p>
             </div>
         </div>
 
-        <section class="card">
-            <h2><i class="fas fa-filter"></i> Filter Data</h2>
-            <div class="filter-section">
-                <div class="filter-group">
-                    <label for="dari-tanggal">Dari Tanggal:</label>
-                    <input type="date" id="dari-tanggal" value="2025-09-01">
-                </div>
-                <div class="filter-group">
-                    <label for="sampai-tanggal">Sampai Tanggal:</label>
-                    <input type="date" id="sampai-tanggal" value="2025-09-05">
-                </div>
-                <div class="filter-group">
-                    <label for="plant">Plant:</label>
-                    <select id="plant">
-                        <option value="semua">Semua Plant</option>
-                        <option value="Denpasar 2">Denpasar 2</option>
-                        <option value="Gianyar">Gianyar</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="status">Status:</label>
-                    <select id="status">
-                        <option value="semua">Semua Status</option>
-                        <option value="terkirim">Terkirim</option>
-                        <option value="tertunda">Tertunda</option>
-                    </select>
-                </div>
-            </div>
-            <div class="filter-actions">
-                <button class="btn btn-primary" id="terapkan-filter">
-                    <i class="fas fa-check"></i> Terapkan Filter
-                </button>
-                <button class="btn btn-secondary" id="reset-filter">
-                    <i class="fas fa-redo"></i> Reset Filter
-                </button>
-            </div>
-        </section>
-
-        <section class="summary-cards">
-            <div class="plant-summary">
-                <h2><i class="fas fa-industry"></i> Denpasar 2</h2>
-                <p><strong>Volume Order:</strong> <span id="denpasar-order">167</span> m³</p>
-                <p><strong>Volume Terkirim:</strong> <span id="denpasar-terkirim">45</span> m³</p>
-                <p><strong>Volume Tertunda:</strong> <span id="denpasar-tertunda">122</span> m³</p>
-                <p><strong>Proyek Tertunda:</strong> <span id="denpasar-proyek-tertunda">5</span></p>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill denpasar-progress" id="denpasar-progress" style="width: 27%;"></div>
-                </div>
-                <div class="percentage">
-                    <span class="terkirim">Terkirim: 27%</span>
-                    <span class="tertunda">Tertunda: 73%</span>
-                </div>
-            </div>
-            
-            <div class="plant-summary">
-                <h2><i class="fas fa-industry"></i> Gianyar</h2>
-                <p><strong>Volume Order:</strong> <span id="gianyar-order">91</span> m³</p>
-                <p><strong>Volume Terkirim:</strong> <span id="gianyar-terkirim">0</span> m³</p>
-                <p><strong>Volume Tertunda:</strong> <span id="gianyar-tertunda">91</span> m³</p>
-                <p><strong>Proyek Tertunda:</strong> <span id="gianyar-proyek-tertunda">4</span></p>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill gianyar-progress" id="gianyar-progress" style="width: 0%;"></div>
-                </div>
-                <div class="percentage">
-                    <span class="terkirim">Terkirim: 0%</span>
-                    <span class="tertunda">Tertunda: 100%</span>
-                </div>
-            </div>
-        </section>
-
-        <div class="last-update">
-            <p>Data diperbarui secara real-time. Terakhir update: <span id="update-time">05/09/2025 15:30</span></p>
+        <div class="notification" id="notification">
+            Data berhasil disimpan!
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Data contoh
-            const deliveryData = [
-                { 
-                    tanggal: '2025-09-02', 
-                    plant: 'Denpasar 2', 
-                    siteNo: 'DP001', 
-                    siteName: 'Proyek A', 
-                    qtyOrder: 50, 
-                    qtyDelivery: 25, 
-                    qtyRemain: 25, 
-                    qtyCancel: 0 
-                },
-                { 
-                    tanggal: '2025-09-02', 
-                    plant: 'Denpasar 2', 
-                    siteNo: 'DP002', 
-                    siteName: 'Proyek B', 
-                    qtyOrder: 40, 
-                    qtyDelivery: 20, 
-                    qtyRemain: 20, 
-                    qtyCancel: 0 
-                },
-                { 
-                    tanggal: '2025-09-03', 
-                    plant: 'Gianyar', 
-                    siteNo: 'GY001', 
-                    siteName: 'Proyek C', 
-                    qtyOrder: 30, 
-                    qtyDelivery: 0, 
-                    qtyRemain: 30, 
-                    qtyCancel: 0 
-                },
-                { 
-                    tanggal: '2025-09-03', 
-                    plant: 'Gianyar', 
-                    siteNo: 'GY002', 
-                    siteName: 'Proyek D', 
-                    qtyOrder: 35, 
-                    qtyDelivery: 0, 
-                    qtyRemain: 35, 
-                    qtyCancel: 0 
+            // Inisialisasi data jika belum ada
+            if (!localStorage.getItem('deliveryData')) {
+                localStorage.setItem('deliveryData', JSON.stringify([]));
+            }
+            
+            // Elemen UI
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const notification = document.getElementById('notification');
+            
+            // Elemen form input
+            const tanggalInput = document.getElementById('tanggal');
+            const plantInput = document.getElementById('plant-input');
+            const siteNoInput = document.getElementById('site-no');
+            const siteNameInput = document.getElementById('site-name');
+            const qtyOrderInput = document.getElementById('qty-order');
+            const qtyDeliveryInput = document.getElementById('qty-delivery');
+            const qtyCancelInput = document.getElementById('qty-cancel');
+            const qtyRemainInput = document.getElementById('qty-remain');
+            const tambahDataBtn = document.getElementById('tambah-data');
+            const simpanDataBtn = document.getElementById('simpan-data');
+            const resetDataBtn = document.getElementById('reset-data');
+            const tableBody = document.getElementById('table-body');
+            
+            // Fungsi untuk berpindah tab
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Nonaktifkan semua tab
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Aktifkan tab yang dipilih
+                    this.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                    
+                    // Jika pindah ke dashboard, perbarui data
+                    if (tabId === 'dashboard') {
+                        updateDashboard();
+                    }
+                });
+            });
+            
+            // Fungsi untuk menampilkan notifikasi
+            function showNotification(message, isError = false) {
+                notification.textContent = message;
+                notification.style.display = 'block';
+                notification.style.backgroundColor = isError ? '#e74c3c' : '#2ecc71';
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+            
+            // Fungsi untuk mendapatkan semua data
+            function getAllData() {
+                const data = localStorage.getItem('deliveryData');
+                return data ? JSON.parse(data) : [];
+            }
+            
+            // Fungsi untuk menyimpan data
+            function saveData(data) {
+                localStorage.setItem('deliveryData', JSON.stringify(data));
+                // Simpan timestamp update terakhir
+                const now = new Date();
+                const formattedDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                localStorage.setItem('lastUpdate', formattedDate);
+                document.getElementById('last-update').textContent = formattedDate;
+                return formattedDate;
+            }
+            
+            // Fungsi untuk menghitung sisa quantity
+            function calculateRemain() {
+                const qtyOrder = parseFloat(qtyOrderInput.value) || 0;
+                const qtyDelivery = parseFloat(qtyDeliveryInput.value) || 0;
+                const qtyCancel = parseFloat(qtyCancelInput.value) || 0;
+                
+                const qtyRemain = qtyOrder - qtyDelivery - qtyCancel;
+                qtyRemainInput.value = qtyRemain >= 0 ? qtyRemain : 0;
+            }
+            
+            // Event listener untuk input perubahan
+            qtyOrderInput.addEventListener('input', calculateRemain);
+            qtyDeliveryInput.addEventListener('input', calculateRemain);
+            qtyCancelInput.addEventListener('input', calculateRemain);
+            
+            // Fungsi untuk merender tabel
+            function renderTable() {
+                const deliveryData = getAllData();
+                tableBody.innerHTML = '';
+                
+                if (deliveryData.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td colspan="9" style="text-align: center; padding: 20px;">
+                            Belum ada data. Silakan tambah data menggunakan form di atas.
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                    return;
                 }
-            ];
-
+                
+                deliveryData.forEach((data, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${formatDate(data.tanggal)}</td>
+                        <td>${data.plant}</td>
+                        <td>${data.siteNo}</td>
+                        <td>${data.siteName}</td>
+                        <td>${data.qtyOrder} m³</td>
+                        <td>${data.qtyDelivery} m³</td>
+                        <td>${data.qtyRemain} m³</td>
+                        <td>${data.qtyCancel} m³</td>
+                        <td class="action-cell">
+                            <button class="btn btn-danger" onclick="deleteData(${index})"><i class="fas fa-trash"></i></button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            // Format tanggal untuk tampilan
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+            }
+            
+            // Fungsi untuk menghapus data
+            window.deleteData = function(index) {
+                if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                    const deliveryData = getAllData();
+                    deliveryData.splice(index, 1);
+                    saveData(deliveryData);
+                    renderTable();
+                    showNotification('Data berhasil dihapus!');
+                }
+            };
+            
+            // Fungsi untuk menambah data
+            tambahDataBtn.addEventListener('click', function() {
+                // Validasi input
+                if (!siteNoInput.value || !siteNameInput.value) {
+                    showNotification('Site No dan Site Name harus diisi!', true);
+                    return;
+                }
+                
+                const deliveryData = getAllData();
+                const newData = {
+                    tanggal: tanggalInput.value,
+                    plant: plantInput.value,
+                    siteNo: siteNoInput.value,
+                    siteName: siteNameInput.value,
+                    qtyOrder: parseFloat(qtyOrderInput.value) || 0,
+                    qtyDelivery: parseFloat(qtyDeliveryInput.value) || 0,
+                    qtyCancel: parseFloat(qtyCancelInput.value) || 0,
+                    qtyRemain: parseFloat(qtyRemainInput.value) || 0
+                };
+                
+                deliveryData.push(newData);
+                saveData(deliveryData);
+                renderTable();
+                
+                // Reset form
+                siteNoInput.value = '';
+                siteNameInput.value = '';
+                qtyOrderInput.value = '0';
+                qtyDeliveryInput.value = '0';
+                qtyCancelInput.value = '0';
+                qtyRemainInput.value = '0';
+                
+                showNotification('Data berhasil ditambahkan!');
+            });
+            
+            // Fungsi untuk reset data
+            resetDataBtn.addEventListener('click', function() {
+                if (confirm('Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan.')) {
+                    localStorage.setItem('deliveryData', JSON.stringify([]));
+                    renderTable();
+                    showNotification('Semua data telah dihapus!');
+                }
+            });
+            
             // Hitung statistik
             function calculateStats() {
+                const deliveryData = getAllData();
+                
                 let totalVolume = 0;
                 let totalTerkirim = 0;
                 let totalTertunda = 0;
@@ -576,7 +957,10 @@
             function initCharts(stats) {
                 // Chart distribusi volume
                 const volumeCtx = document.getElementById('volumeChart').getContext('2d');
-                new Chart(volumeCtx, {
+                if (window.volumeChartInstance) {
+                    window.volumeChartInstance.destroy();
+                }
+                window.volumeChartInstance = new Chart(volumeCtx, {
                     type: 'pie',
                     data: {
                         labels: ['Terkirim', 'Tertunda'],
@@ -603,7 +987,10 @@
                 
                 // Chart perbandingan plant
                 const plantCtx = document.getElementById('plantComparisonChart').getContext('2d');
-                new Chart(plantCtx, {
+                if (window.plantChartInstance) {
+                    window.plantChartInstance.destroy();
+                }
+                window.plantChartInstance = new Chart(plantCtx, {
                     type: 'bar',
                     data: {
                         labels: ['Denpasar 2', 'Gianyar'],
@@ -655,24 +1042,26 @@
                 });
             }
             
+            // Update dashboard
+            function updateDashboard() {
+                const stats = calculateStats();
+                updateUI(stats);
+                initCharts(stats);
+            }
+            
             // Event listener untuk filter
             document.getElementById('terapkan-filter').addEventListener('click', function() {
-                alert('Filter diterapkan!');
                 // Diimplementasikan nanti untuk filter data
+                showNotification('Filter diterapkan!');
             });
             
             document.getElementById('reset-filter').addEventListener('click', function() {
-                document.getElementById('dari-tanggal').value = '2025-09-01';
-                document.getElementById('sampai-tanggal').value = '2025-09-05';
+                document.getElementById('dari-tanggal').value = '';
+                document.getElementById('sampai-tanggal').value = '';
                 document.getElementById('plant').value = 'semua';
                 document.getElementById('status').value = 'semua';
-                alert('Filter direset!');
+                showNotification('Filter direset!');
             });
-            
-            // Jalankan fungsi inisialisasi
-            const stats = calculateStats();
-            updateUI(stats);
-            initCharts(stats);
             
             // Update waktu
             function updateTime() {
@@ -688,6 +1077,13 @@
                 document.getElementById('update-time').textContent = formattedDate;
             }
             
+            // Inisialisasi
+            const lastUpdate = localStorage.getItem('lastUpdate');
+            if (lastUpdate) {
+                document.getElementById('last-update').textContent = lastUpdate;
+            }
+            
+            renderTable();
             updateTime();
             setInterval(updateTime, 60000); // Update setiap menit
         });
