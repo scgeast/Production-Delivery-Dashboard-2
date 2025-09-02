@@ -336,7 +336,7 @@
         
         .form-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
@@ -448,6 +448,45 @@
             <button class="tab-button" data-tab="dashboard">Dashboard</button>
         </div>
 
+        <!-- Filter Section (Ditempatkan di atas kedua tab) -->
+        <section class="card" id="filter-section">
+            <h2><i class="fas fa-filter"></i> Filter Data</h2>
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="dari-tanggal">Dari Tanggal:</label>
+                    <input type="date" id="dari-tanggal">
+                </div>
+                <div class="filter-group">
+                    <label for="sampai-tanggal">Sampai Tanggal:</label>
+                    <input type="date" id="sampai-tanggal">
+                </div>
+                <div class="filter-group">
+                    <label for="plant">Plant:</label>
+                    <select id="plant">
+                        <option value="semua">Semua Plant</option>
+                        <option value="Denpasar 2">Denpasar 2</option>
+                        <option value="Gianyar">Gianyar</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="status">Status:</label>
+                    <select id="status">
+                        <option value="semua">Semua Status</option>
+                        <option value="terkirim">Terkirim</option>
+                        <option value="tertunda">Tertunda</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" id="terapkan-filter">
+                    <i class="fas fa-check"></i> Terapkan Filter
+                </button>
+                <button class="btn btn-secondary" id="reset-filter">
+                    <i class="fas fa-redo"></i> Reset Filter
+                </button>
+            </div>
+        </section>
+
         <!-- Tab Entry Data -->
         <div id="entry-tab" class="tab-content active">
             <section class="entry-form">
@@ -469,14 +508,12 @@
                     
                     <div class="form-group">
                         <label for="site-no">Site No</label>
-                        <input type="text" id="site-no" placeholder="Masukkan Site No">
+                        <input type="text" id="site-no" placeholder="Site No">
                     </div>
-                </div>
-                
-                <div class="form-row">
+                    
                     <div class="form-group">
                         <label for="site-name">Site Name</label>
-                        <input type="text" id="site-name" placeholder="Masukkan Site Name">
+                        <input type="text" id="site-name" placeholder="Site Name">
                     </div>
                     
                     <div class="form-group">
@@ -488,9 +525,7 @@
                         <label for="qty-delivery">Qty Delivery (m³)</label>
                         <input type="number" id="qty-delivery" min="0" value="0">
                     </div>
-                </div>
-                
-                <div class="form-row">
+                    
                     <div class="form-group">
                         <label for="qty-cancel">Qty Cancel (m³)</label>
                         <input type="number" id="qty-cancel" min="0" value="0">
@@ -503,7 +538,7 @@
                     
                     <div class="form-group">
                         <label style="opacity: 0;">Aksi</label>
-                        <button class="btn btn-success" id="tambah-data"><i class="fas fa-plus"></i> Tambah Data</button>
+                        <button class="btn btn-success" id="tambah-data"><i class="fas fa-plus"></i> Tambah</button>
                     </div>
                 </div>
             </section>
@@ -580,44 +615,6 @@
                     </div>
                 </div>
             </div>
-
-            <section class="card">
-                <h2><i class="fas fa-filter"></i> Filter Data</h2>
-                <div class="filter-section">
-                    <div class="filter-group">
-                        <label for="dari-tanggal">Dari Tanggal:</label>
-                        <input type="date" id="dari-tanggal">
-                    </div>
-                    <div class="filter-group">
-                        <label for="sampai-tanggal">Sampai Tanggal:</label>
-                        <input type="date" id="sampai-tanggal">
-                    </div>
-                    <div class="filter-group">
-                        <label for="plant">Plant:</label>
-                        <select id="plant">
-                            <option value="semua">Semua Plant</option>
-                            <option value="Denpasar 2">Denpasar 2</option>
-                            <option value="Gianyar">Gianyar</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label for="status">Status:</label>
-                        <select id="status">
-                            <option value="semua">Semua Status</option>
-                            <option value="terkirim">Terkirim</option>
-                            <option value="tertunda">Tertunda</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="filter-actions">
-                    <button class="btn btn-primary" id="terapkan-filter">
-                        <i class="fas fa-check"></i> Terapkan Filter
-                    </button>
-                    <button class="btn btn-secondary" id="reset-filter">
-                        <i class="fas fa-redo"></i> Reset Filter
-                    </button>
-                </div>
-            </section>
 
             <section class="summary-cards">
                 <div class="plant-summary">
@@ -731,10 +728,15 @@
                 localStorage.setItem('deliveryData', JSON.stringify(data));
                 // Simpan timestamp update terakhir
                 const now = new Date();
-                const formattedDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth()+1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                const formattedDate = formatDateTime(now);
                 localStorage.setItem('lastUpdate', formattedDate);
                 document.getElementById('last-update').textContent = formattedDate;
                 return formattedDate;
+            }
+            
+            // Format tanggal dan waktu untuk tampilan
+            function formatDateTime(date) {
+                return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth()+1).toString().padStart(2, '0')}/${date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
             }
             
             // Fungsi untuk menghitung sisa quantity
@@ -1066,14 +1068,7 @@
             // Update waktu
             function updateTime() {
                 const now = new Date();
-                const options = { 
-                    day: '2-digit', 
-                    month: '2-digit', 
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                };
-                const formattedDate = now.toLocaleDateString('id-ID', options);
+                const formattedDate = formatDateTime(now);
                 document.getElementById('update-time').textContent = formattedDate;
             }
             
@@ -1081,6 +1076,12 @@
             const lastUpdate = localStorage.getItem('lastUpdate');
             if (lastUpdate) {
                 document.getElementById('last-update').textContent = lastUpdate;
+            } else {
+                // Set initial last update time to current time
+                const now = new Date();
+                const formattedDate = formatDateTime(now);
+                document.getElementById('last-update').textContent = formattedDate;
+                localStorage.setItem('lastUpdate', formattedDate);
             }
             
             renderTable();
